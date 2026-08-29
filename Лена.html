@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Идти ли бухать с Леной?</title>
+
+  <style>
+    :root {
+      --pink: #ff4f9a;
+      --purple: #7146c1;
+      --yellow: #ffe56b;
+      --dark: #24182f;
+      --light-pink: #fff0f7;
+      --gray: #756b7d;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 18px;
+      color: var(--dark);
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at 10% 10%, #ffe56b 0 70px, transparent 71px),
+        radial-gradient(circle at 90% 90%, #ff9bc6 0 120px, transparent 121px),
+        linear-gradient(135deg, #ffd7e9, #e4d5ff 55%, #fff5b2);
+    }
+
+    .app {
+      width: min(720px, 100%);
+      margin: 0 auto;
+    }
+
+    .screen {
+      display: none;
+      animation: appear .35s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .intro {
+      min-height: calc(100vh - 36px);
+      text-align: center;
+      place-items: center;
+    }
+
+    .intro.active {
+      display: grid;
+    }
+
+    .sticker {
+      display: inline-block;
+      padding: 9px 14px;
+      color: white;
+      border-radius: 30px;
+      background: var(--pink);
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+      transform: rotate(-3deg);
+    }
+
+    .bottle {
+      margin: 18px 0 8px;
+      font-size: 90px;
+      filter: drop-shadow(6px 7px 0 rgba(36, 24, 47, .2));
+    }
+
+    h1 {
+      margin: 10px 0 18px;
+      color: var(--purple);
+      font-size: clamp(38px, 9vw, 70px);
+      line-height: 1;
+      text-shadow: 3px 3px 0 white;
+    }
+
+    .intro p {
+      max-width: 600px;
+      margin: 0 auto 27px;
+      font-size: 20px;
+      line-height: 1.5;
+    }
+
+    button {
+      border: 0;
+      border-radius: 15px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: bold;
+      transition: transform .18s ease, filter .18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      filter: brightness(1.06);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .primary {
+      padding: 17px 25px;
+      color: var(--dark);
+      background: var(--yellow);
+      box-shadow: 5px 6px 0 #c6a82f;
+    }
+
+    .quiz-card,
+    .result-card {
+      margin-top: 24px;
+      padding: clamp(22px, 5vw, 42px);
+      border: 3px solid var(--dark);
+      border-radius: 25px;
+      background: rgba(255, 255, 255, .95);
+      box-shadow: 9px 10px 0 rgba(36, 24, 47, .2);
+    }
+
+    .quiz-label,
+    .result-label {
+      color: var(--purple);
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .question-number {
+      margin-top: 14px;
+      color: var(--gray);
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .progress {
+      height: 12px;
+      margin: 16px 0 29px;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #eadff0;
+    }
+
+    .progress-bar {
+      width: 10%;
+      height: 100%;
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--pink), var(--purple));
+      transition: width .3s ease;
+    }
+
+    h2 {
+      margin: 12px 0 24px;
+      font-size: clamp(26px, 6vw, 39px);
+      line-height: 1.2;
+    }
+
+    .answers {
+      display: grid;
+      gap: 12px;
+    }
+
+    .answer {
+      width: 100%;
+      padding: 16px 18px;
+      color: var(--dark);
+      border: 2px solid #dfd0e9;
+      background: white;
+      text-align: left;
+      line-height: 1.4;
+    }
+
+    .answer:hover {
+      border-color: var(--pink);
+      background: var(--light-pink);
+    }
+
+    .result-card {
+      text-align: center;
+    }
+
+    .result-emoji {
+      margin: 5px 0 15px;
+      font-size: 95px;
+    }
+
+    .result-label {
+      color: var(--pink);
+    }
+
+    .result-title {
+      margin: 15px 0 20px;
+      color: var(--purple);
+      font-size: clamp(29px, 7vw, 49px);
+      line-height: 1.15;
+    }
+
+    .result-text {
+      margin: 0 auto 22px;
+      font-size: 21px;
+      line-height: 1.55;
+    }
+
+    .result-note {
+      padding: 16px;
+      border-radius: 14px;
+      background: #fff1a8;
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.4;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .secondary {
+      padding: 14px 20px;
+      color: var(--purple);
+      border: 2px solid var(--purple);
+      background: transparent;
+    }
+
+    .share-message {
+      min-height: 20px;
+      margin-top: 15px;
+      color: var(--gray);
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+
+    <section id="introScreen" class="screen intro active">
+      <div>
+        <div class="sticker">Срочный опрос для своих</div>
+
+        <div class="bottle">🍾</div>
+
+        <h1>Идти ли бухать с Леной?</h1>
+
+        <p>
+          Лена зовет, а все молчат. Ситуация критическая.
+          Ответь на 10 вопросов и узнай, где ты сегодня вечером:
+          дома или на Радугу.
+        </p>
+
+        <button id="startButton" class="primary">
+          УЗНАТЬ СУДЬБУ
+        </button>
+      </div>
+    </section>
+
+    <section id="quizScreen" class="screen">
+      <div class="quiz-card">
+        <div class="quiz-label">Анонимный тест для своих</div>
+
+        <div id="questionNumber" class="question-number"></div>
+
+        <div class="progress">
+          <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <h2 id="questionText"></h2>
+
+        <div id="answers" class="answers"></div>
+      </div>
+    </section>
+
+    <section id="resultScreen" class="screen">
+      <div class="result-card">
+        <div id="resultEmoji" class="result-emoji"></div>
+
+        <div class="result-label">Официальный вердикт комиссии</div>
+
+        <h2 id="resultTitle" class="result-title"></h2>
+
+        <p id="resultText" class="result-text"></p>
+
+        <div id="resultNote" class="result-note"></div>
+
+        <div class="actions">
+          <button id="restartButton" class="primary">
+            ПРОЙТИ ЕЩЕ РАЗ
+          </button>
+
+          <button id="shareButton" class="secondary">
+            ОТПРАВИТЬ В ЧАТ
+          </button>
+        </div>
+
+        <div id="shareMessage" class="share-message"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    "use strict";
+
+    const results = {
+      pensioner: {
+        title: "Я пенсионерка",
+        emoji: "👵",
+        text: "Сижу, трясу песок в трусы дома. Лена, конечно, зовет красиво, но дома тоже движ: плед, сериал и стратегический запас вкусняшек.",
+        note: "Вердикт: сегодня тусовка проходит у тебя на диване."
+      },
+
+      lazy: {
+        title: "Я ленивая коза",
+        emoji: "🛋️",
+        text: "Лежу, пержу дома. Вставать, одеваться и куда-то идти слишком энергозатратно. Ты не игноришь Лену, ты просто бережешь свой ресурс.",
+        note: "Вердикт: морально ты уже пришла, физически пока нет."
+      },
+
+      rainbow: {
+        title: "Я иду с Леной бухать!",
+        emoji: "🎉",
+        text: "Где мой билет на Радугу? Ты единственная, кто поняла масштаб исторического события. Пока остальные молчат, ты уже собираешься и уточняешь, кто берет закуску.",
+        note: "Вердикт: Лена, забирай эту легенду. Человек готов!"
+      },
+
+      bee: {
+        title: "Я домашняя пчелка",
+        emoji: "🐝",
+        text: "Я ващета домашняя пчелка: кручу закрутки, навожу уют и вообще у меня важные дела. Но где-то глубоко внутри душа уже танцует под музыку на Радуге.",
+        note: "Вердикт: сначала закрутки, потом посмотрим по ситуации."
+      }
+    };
+
+    const questions = [
+      {
+        text: "Лена пишет: «Ну что, идем?» Твоя первая мысль:",
+        answers: [
+          ["А где встречаемся и во сколько?", "rainbow"],
+          ["Я уже устала от одного этого сообщения", "lazy"],
+          ["Надо ответить после домашних дел", "bee"],
+          ["Может, завтра? Сегодня я пенсионерка", "pensioner"]
+        ]
+      },
+      {
+        text: "Что сейчас происходит у тебя дома?",
+        answers: [
+          ["Лежу и не собираюсь вставать", "lazy"],
+          ["Кручу закрутки, я занятая женщина", "bee"],
+          ["Сижу в халате и трясу песок в трусы", "pensioner"],
+          ["Ищу сумку и зарядку", "rainbow"]
+        ]
+      },
+      {
+        text: "Как ты обычно отвечаешь в общем чате?",
+        answers: [
+          ["Ставлю реакцию и исчезаю", "lazy"],
+          ["Пишу длинное сообщение с планом", "bee"],
+          ["Читаю, но сил ответить нет", "pensioner"],
+          ["Пишу: «Я в деле!»", "rainbow"]
+        ]
+      },
+      {
+        text: "Тебе говорят: «Будет весело». Ты:",
+        answers: [
+          ["Уточняю, будет ли где сесть", "pensioner"],
+          ["Спрашиваю, кто отвечает за закуску", "bee"],
+          ["Верю без доказательств и уже выхожу", "rainbow"],
+          ["Переворачиваюсь на другой бок", "lazy"]
+        ]
+      },
+      {
+        text: "Какой у тебя уровень готовности к выходу?",
+        answers: [
+          ["Одежда выбрана, настроение боевое", "rainbow"],
+          ["Еще пять минут полежу. Возможно, пять часов", "lazy"],
+          ["Сначала надо закончить дела по дому", "bee"],
+          ["Мне нужен официальный приказ и транспорт", "pensioner"]
+        ]
+      },
+      {
+        text: "Что важнее всего для идеального вечера?",
+        answers: [
+          ["Компания и громкий смех", "rainbow"],
+          ["Диван, тишина и никто не трогает", "lazy"],
+          ["Чтобы дома все было прибрано", "bee"],
+          ["Чай, тапочки и спокойный телевизор", "pensioner"]
+        ]
+      },
+      {
+        text: "Лена уже спрашивает, где ты. Что отвечаешь?",
+        answers: [
+          ["Выезжаю, скинь адрес!", "rainbow"],
+          ["Я буквально собираюсь", "lazy"],
+          ["После того как закручу еще одну банку", "bee"],
+          ["Я сегодня дома, душой с вами", "pensioner"]
+        ]
+      },
+      {
+        text: "Какая фраза максимально про тебя?",
+        answers: [
+          ["Где мой билет на Радугу?", "rainbow"],
+          ["Я вообще-то занята домашними делами", "bee"],
+          ["Я сегодня никуда не выхожу", "pensioner"],
+          ["Я бы пошла, но горизонтальное положение удобное", "lazy"]
+        ]
+      },
+      {
+        text: "Если все-таки пойдешь, что возьмешь с собой?",
+        answers: [
+          ["Хорошее настроение и танцевальный настрой", "rainbow"],
+          ["Контейнер с домашней закуской", "bee"],
+          ["Теплые носки на всякий случай", "pensioner"],
+          ["Ничего. Я даже телефон заряжать не хочу", "lazy"]
+        ]
+      },
+      {
+        text: "Финальный вопрос: Лена зовет, а все молчат. Твое решение?",
+        answers: [
+          ["Молчание закончено. Я иду!", "rainbow"],
+          ["Я за, но сначала дела дома", "bee"],
+          ["Я поддерживаю вас морально с дивана", "lazy"],
+          ["Деточка, я сегодня никуда не выхожу", "pensioner"]
+        ]
+      }
+    ];
+
+    let currentQuestion = 0;
+    let scores = {};
+
+    const introScreen = document.getElementById("introScreen");
+    const quizScreen = document.getElementById("quizScreen");
+    const resultScreen = document.getElementById("resultScreen");
+
+    const startButton = document.getElementById("startButton");
+    const restartButton = document.getElementById("restartButton");
+    const shareButton = document.getElementById("shareButton");
+
+    const questionNumber = document.getElementById("questionNumber");
+    const questionText = document.getElementById("questionText");
+    const progressBar = document.getElementById("progressBar");
+    const answersContainer = document.getElementById("answers");
+
+    const resultEmoji = document.getElementById("resultEmoji");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultText = document.getElementById("resultText");
+    const resultNote = document.getElementById("resultNote");
+    const shareMessage = document.getElementById("shareMessage");
+
+    function showScreen(screen) {
+      introScreen.classList.remove("active");
+      quizScreen.classList.remove("active");
+      resultScreen.classList.remove("active");
+
+      screen.classList.add("active");
+      window.scrollTo(0, 0);
+    }
+
+    function startQuiz() {
+      currentQuestion = 0;
+      scores = {
+        pensioner: 0,
+        lazy: 0,
+        rainbow: 0,
+        bee: 0
+      };
+
+      shareMessage.textContent = "";
+      showScreen(quizScreen);
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const question = questions[currentQuestion];
+      const questionIndex = currentQuestion + 1;
+      const progress = questionIndex / questions.length * 100;
+
+      questionNumber.textContent =
+        "Вопрос " + questionIndex + " из " + questions.length;
+
+      questionText.textContent = question.text;
+      progressBar.style.width = progress + "%";
+      answersContainer.innerHTML = "";
+
+      question.answers.forEach(function(answer) {
+        const answerButton = document.createElement("button");
+
+        answerButton.className = "answer";
+        answerButton.type = "button";
+        answerButton.textContent = answer[0];
+
+        answerButton.addEventListener("click", function() {
+          const resultKey = answer[1];
+
+          scores[resultKey]++;
+          currentQuestion++;
+
+          if (currentQuestion < questions.length) {
+            renderQuestion();
+          } else {
+            showResult();
+          }
+        });
+
+        answersContainer.appendChild(answerButton);
+      });
+    }
+
+    function showResult() {
+      let winner = "pensioner";
+
+      Object.keys(scores).forEach(function(resultKey) {
+        if (scores[resultKey] > scores[winner]) {
+          winner = resultKey;
+        }
+      });
+
+      const result = results[winner];
+
+      resultEmoji.textContent = result.emoji;
+      resultTitle.textContent = result.title;
+      resultText.textContent = result.text;
+      resultNote.textContent = result.note;
+
+      showScreen(resultScreen);
+    }
+
+    async function shareResult() {
+      const text =
+        "Я прошла тест «Идти ли бухать с Леной?» и мой результат: " +
+        resultTitle.textContent +
+        ". А ты идешь?";
+
+      try {
+        if (navigator.share) {
+          await navigator.share({
+            title: "Идти ли бухать с Леной?",
+            text: text
+          });
+
+          return;
+        }
+
+        await navigator.clipboard.writeText(text);
+        shareMessage.textContent =
+          "Результат скопирован. Отправляй его в чат!";
+      } catch (error) {
+        shareMessage.textContent =
+          "Скопируй результат вручную и отправь Лене.";
+      }
+    }
+
+    startButton.addEventListener("click", startQuiz);
+    restartButton.addEventListener("click", startQuiz);
+    shareButton.addEventListener("click", shareResult);
+  </script>
+</body>
+</html>
